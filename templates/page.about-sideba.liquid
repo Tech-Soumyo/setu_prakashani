@@ -1,0 +1,71 @@
+{% style %}
+  
+  .about-section-container {
+    display: flex;
+    gap: 30px; 
+    max-width: 1100px; 
+    margin: 0 auto;
+    padding: 5px;
+  }
+  .about-sidebar {
+    flex: 0 0 250px;
+    padding-right: 20px;
+    border-right: 1px solid #eee;
+  }
+  .about-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .about-sidebar li a {
+    display: block;
+    padding: 10px 0;
+    text-color: #E2DAD8;
+    text-decoration: none;
+    color: #333;
+  }
+  .about-sidebar li a:hover,
+  .about-sidebar li a.active {
+    color: #000;
+    font-weight: bold;
+  }
+  .about-main-content {
+    flex-grow: 1;
+  }
+  .about-main-content h1 {
+    margin-top: 0;
+  }
+   /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .about-section-container {
+      flex-direction: column;
+    }
+    .about-sidebar {
+      flex: 0 0 auto; 
+      border-right: none;
+      border-bottom: 1px solid #eee; 
+      margin-bottom: 20px;
+      padding-right: 0;
+    }
+  }
+{% endstyle %}
+
+<div class="about-section-container">
+  <aside class="about-sidebar">
+    <ul>
+      {% for link in linklists.about-section-sidebar.links %}
+        <li>
+          <a href="{{ link.url }}" class="{% if link.active or (link.child_active and link.type == 'dropdown') or (link.url == page.url and not page.url == '/') %}active{% endif %}">
+            {{ link.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+  <main class="about-main-content">
+    <h1>{{ page.title }}</h1>
+    <div class="rte">
+      {{ page.content }}
+    </div>
+  </main>
+</div>
