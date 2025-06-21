@@ -1,0 +1,91 @@
+<!-- File: sections/multicolumn-container.liquid -->
+
+<style>
+  .multicolumn-container {
+    padding: {{ section.settings.padding }}px;
+  }
+  
+  .multicolumn-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+    gap: {{ section.settings.gap }}px;
+  }
+  
+  @media (max-width: 768px) {
+    .multicolumn-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .multicolumn-column {
+    min-height: 50px;
+  }
+</style>
+
+<div class="multicolumn-container">
+  <div class="multicolumn-grid">
+    {% for block in section.blocks %}
+      <div class="multicolumn-column" {{ block.shopify_attributes }}>
+        {{ block.settings.content }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Multicolumn Container",
+  "settings": [
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Number of Columns",
+      "min": 1,
+      "max": 6,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Column Gap",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Container Padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Column Content",
+          "default": "<p>Add content here</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Multicolumn Container",
+      "blocks": [
+        { "type": "column" },
+        { "type": "column" },
+        { "type": "column" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,129 @@
+{{ 'section-upcoming-books.css' | asset_url | stylesheet_tag }}
+
+<div class="upcoming-books-section section-{{ section.id }}">
+  <div class="page-width">
+    {% if section.settings.title != blank %}
+      <h2 class="upcoming-books-title">{{ section.settings.title | escape }}</h2>
+    {% endif %}
+
+    <div class="upcoming-books-grid">
+      {% for block in section.blocks %}
+        <div class="upcoming-book-item" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            <div class="upcoming-book-media">
+              {{ block.settings.image | image_url: width: 500 | image_tag: loading: 'lazy', sizes: '(max-width: 749px) 100vw, 30vw' }}
+            </div>
+          {% endif %}
+
+          <div class="upcoming-book-content">
+            {% if block.settings.title != blank %}
+              <h3 class="upcoming-book-title">{{ block.settings.title | escape }}</h3>
+            {% endif %}
+            {% if block.settings.author != blank %}
+              <p class="upcoming-book-author">{{ 'sections.upcoming_books.by_author' | t: author: block.settings.author | escape }}</p>
+            {% endif %}
+
+            <div class="upcoming-book-buttons">
+              {% if block.settings.notify_button_label != blank %}
+                <button
+                  type="button"
+                  class="button notify-me-button"
+                  data-book-title="{{ block.settings.title | escape }}"
+                  data-book-author="{{ block.settings.author | escape }}"
+                >
+                  {{ block.settings.notify_button_label | escape }}
+                </button>
+              {% endif %}
+
+              {% if block.settings.prebook_button_label != blank and block.settings.prebook_link != blank %}
+                <a href="{{ block.settings.prebook_link }}" class="button prebook-now-button">
+                  {{ block.settings.prebook_button_label | escape }}
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.upcoming_books.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Upcoming Books",
+      "label": "t:sections.upcoming_books.settings.title.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "book",
+      "name": "t:sections.upcoming_books.blocks.book.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.upcoming_books.blocks.book.settings.image.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "default": "New Book Title",
+          "label": "t:sections.upcoming_books.blocks.book.settings.title.label"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "default": "Author Name",
+          "label": "t:sections.upcoming_books.blocks.book.settings.author.label"
+        },
+        {
+          "type": "header",
+          "content": "Notify Me Button"
+        },
+        {
+          "type": "text",
+          "id": "notify_button_label",
+          "default": "Notify Me",
+          "label": "Button Label"
+        },
+        {
+          "type": "header",
+          "content": "Prebook Now Button"
+        },
+        {
+          "type": "text",
+          "id": "prebook_button_label",
+          "default": "Prebook Now",
+          "label": "Button Label"
+        },
+        {
+          "type": "url",
+          "id": "prebook_link",
+          "label": "Prebook Link",
+          "info": "Link to product page or direct checkout URL."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.upcoming_books.presets.name",
+      "blocks": [
+        {
+          "type": "book"
+        },
+        {
+          "type": "book"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

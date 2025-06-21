@@ -1,0 +1,93 @@
+
+{%- style -%}
+  .about-section-container {
+    display: flex;
+    gap: 30px; /* Adjust gap as needed */
+  }
+  .about-sidebar {
+    flex: 0 0 250px; /* Adjust width as needed */
+    /* Add more styling: border, background, padding etc. */
+    padding: 20px;
+    border-right: 1px solid #eee; /* Example border */
+  }
+  .about-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .about-sidebar li a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  .about-sidebar li a:hover,
+  .about-sidebar li a.active { /* Style for active link */
+    background-color: #f0f0f0; /* Highlight color */
+    color: #000;
+    font-weight: bold;
+  }
+  .about-main-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  .about-main-content h1 { /* Style for the page title in content area */
+    margin-top: 0;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .about-section-container {
+      flex-direction: column;
+    }
+    .about-sidebar {
+      flex: 0 0 auto; /* Reset flex basis */
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #eee; /* Border for mobile */
+      margin-bottom: 20px;
+    }
+  }
+
+{%- endstyle -%}  
+
+<div class="about-section-container page-width">
+  <aside class="about-sidebar">
+    <ul>
+      {% for link in linklists.about-section-sidebar.links %}
+        <li>
+          <a href="{{ link.url }}"
+            class="{% if link.active %}active{% elsif page.url == link.url %}active{% elsif link.child_active and link.type == 'dropdown' %}active{% endif %}">
+            {{ link.title }}
+                  </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+  <main class="about-main-content">
+    <h1>{{ page.title }}</h1>
+    <div class="rte">
+      {{ page.content }}
+    </div>
+    {% comment %}
+      If you have specific sections for "Our Journey", "Our Vision" etc. within the "About our publication" page content,
+      they will render here via {{ page.content }}.
+      If you want to hardcode those specific sub-sections here from metafields or separate content blocks,
+      that's a more advanced customization.
+    {% endcomment %}
+  </main>
+</div>
+
+{% schema %}
+{
+  "name": "Page Content with Sidebar",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Page Content with Sidebar"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,51 @@
+{{ 'custom-collection-layout.css' | asset_url | stylesheet_tag }}
+
+<div class="collection-layout-container page-width">
+  <aside class="collection-sidebar">
+    <ul>
+      {% for link in linklists.book-browsing-sidebar.links %}
+        <li>
+          {% comment %}
+            Highlighting logic:
+            - If link.object.handle matches current collection.handle (for direct collection links)
+            - If link.url is part of the current page.url (for filter links or more complex scenarios)
+          {% endcomment %}
+          <a href="{{ link.url }}"
+             class="{% if link.object and link.object.handle == collection.handle %}active{% elsif request.path == link.url %}active{% endif %}">
+            {{ link.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+{% comment %} --- START CATEGORY PILLS --- {% endcomment %}
+{% if collection.handle == 'all-books' or collection.handle == 'catalogue' %}
+  {% assign category_tags = "Anthropology,Current Affairs,Economics,Environment,Gender Studies,Literature,Human Rights,Journal" | split: ',' %}
+  <div class="category-pills">
+    <p class="pills-title">Browse by category</p> 
+    {% for cat_tag_name in category_tags %}
+      {% assign current_tag_filter = 'Category:' | append: cat_tag_name %}
+      <a href="{{ collection.url }}/{{ current_tag_filter | handleize }}"
+         class="category-pill {% if current_tags contains current_tag_filter %}active{% endif %}">
+        {{ cat_tag_name }}
+      </a>
+    {% endfor %}
+  </div>
+{% endif %}
+{% comment %} --- END CATEGORY PILLS --- {% endcomment %}
+
+</div>
+
+{% schema %}
+{
+  "name": "Collection Sidebar Layout",
+  "class": "collection-sidebar-section-wrapper", // Optional class for the section wrapper itself
+  "settings": [],
+  "presets": [
+    {
+      "name": "Collection Sidebar Layout"
+    }
+  ]
+}
+{% endschema %}

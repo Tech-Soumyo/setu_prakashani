@@ -1,0 +1,100 @@
+.collection-layout-container {
+  display: flex;
+  gap: 20px; /* Space between sidebar and main content */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.collection-sidebar {
+  flex: 0 0 220px; /* Sidebar width, adjust as needed */
+  /* background-color: #f8f8f8; */ /* Example background */
+  /* padding: 15px; */
+}
+
+.collection-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.collection-sidebar li a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  /* border-bottom: 1px solid #eee; */
+}
+.collection-sidebar li a:hover {
+  background-color: #e9e9e9;
+}
+.collection-sidebar li a.active {
+  background-color: #ebe3d5; /* Your theme's active color from image */
+  font-weight: bold;
+  color: #000;
+}
+
+.collection-main-content {
+  flex-grow: 1;
+}
+
+.collection-title {
+  /* If you add it manually */
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.category-pills {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+.pills-title {
+  /* The "Browse by category" title above pills */
+  font-size: 1.5em; /* Adjust as needed */
+  font-weight: bold; /* Adjust as needed */
+  margin-bottom: 15px; /* Space below this title and above pills */
+  color: #333; /* Adjust color */
+}
+
+.category-pill {
+  display: inline-block;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 8px 15px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 14px;
+  border: 1px solid #ddd;
+}
+
+.category-pill:hover {
+  background-color: #e0e0e0;
+}
+.category-pill.active {
+  /* Style for active pill if a filter is applied */
+  background-color: #b0a695; /* Example active color */
+  color: white;
+  font-weight: bold;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .collection-layout-container {
+    flex-direction: column;
+  }
+  .collection-sidebar {
+    flex: 0 0 auto; /* Reset flex basis */
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .category-pills {
+    text-align: center; /* Center pills on mobile */
+  }
+  .pills-title {
+    text-align: left; /* Or center if you prefer */
+  }
+}
