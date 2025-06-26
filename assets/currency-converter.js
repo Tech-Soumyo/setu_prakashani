@@ -1,14 +1,12 @@
 const CurrencyConverter = {
   baseCurrency: "INR",
-  countryCode: null, // Cache country code
+  countryCode: null,
 
-  // Fetch user country using ipapi.co (cache result)
   async getUserCountry() {
     const cachedCountry = localStorage.getItem("user_country");
     if (cachedCountry) {
       const { country, timestamp } = JSON.parse(cachedCountry);
       if (Date.now() - timestamp < 86400000) {
-        // Cache for 24 hours
         this.countryCode = country;
         return country;
       }
@@ -29,36 +27,38 @@ const CurrencyConverter = {
     }
   },
 
-  getCurrencyFromCountry(countryCode) {
-    const currencyMap = {
-      JP: "JPY",
-      CN: "CNY",
-      US: "USD",
-      GB: "GBP",
-      DE: "EUR",
-      FR: "EUR",
-      AU: "AUD",
-      CA: "CAD",
-      IN: "INR",
-      // Add more as needed
-    };
-    return currencyMap[countryCode] || "INR"; // Default to INR
+  getCurrency() {
+    if (window.Shopify?.currency?.active) {
+      return window.Shopify.currency.active;
+    }
+
+    if (window.Shopify?.shop?.enabled_currencies) {
+      const supportedCurrencies = window.Shopify.shop.enabled_currencies.map(
+        (c) => c.iso_code
+      );
+      return supportedCurrencies.includes(this.baseCurrency)
+        ? this.baseCurrency
+        : supportedCurrencies[0] || "INR";
+    }
+
+    return this.baseCurrency;
   },
 
   convertPrice(priceInINR, targetCurrency) {
     let price = priceInINR;
-    // Apply 10% hike if user is outside India
+
     if (this.countryCode && this.countryCode !== "IN") {
       price = priceInINR * 1.1;
     }
 
-    // Use Shopify's conversion rate
     if (
       window.Shopify?.currency?.active === targetCurrency &&
       window.Shopify?.currency?.rate
     ) {
       const shopifyRate = window.Shopify.currency.rate;
-      if (targetCurrency === "INR" || targetCurrency === "JPY") {
+
+      const zeroDecimalCurrencies = ["INR", "JPY"];
+      if (zeroDecimalCurrencies.includes(targetCurrency)) {
         return Math.round(price).toString();
       }
       return (price * shopifyRate).toFixed(2);
@@ -71,20 +71,22 @@ const CurrencyConverter = {
   },
 
   formatPrice(price, currency) {
-    const symbols = {
-      JPY: "¥ JPY",
-      CNY: "¥ CNY",
-      INR: window.Shopify?.currency?.code_enabled ? "₹ INR" : "₹",
-      USD: window.Shopify?.currency?.code_enabled ? "$ USD" : "$",
-      GBP: "£ GBP",
-      EUR: "€ EUR",
-      AUD: "$ AUD",
-      CAD: "$ CAD",
-    };
-    return `${symbols[currency] || currency}${price}`;
+    if (window.Shopify?.formatMoney) {
+      const priceInCents = Math.round(parseFloat(price) * 100);
+      const formatted = window.Shopify.formatMoney(
+        priceInCents,
+        `{{${currency}}}`
+      );
+
+      return window.Shopify?.currency?.code_enabled
+        ? `${formatted} ${currency}`
+        : formatted;
+    }
+
+    console.warn(`Shopify.formatMoney unavailable. Using raw currency code.`);
+    return `${currency}${price}`;
   },
 
-  // Update prices in DOM
   updatePrices(currency) {
     document.querySelectorAll(".price").forEach((priceElement) => {
       const originalPrice = parseFloat(
@@ -117,13 +119,8 @@ const CurrencyConverter = {
 document.addEventListener("DOMContentLoaded", async () => {
   await CurrencyConverter.getUserCountry();
 
-  //  Shopify's active currency if available, else geolocation-based currency
-  console.log(window.Shopify.currency);
-  let currency =
-    window.Shopify?.currency?.active ||
-    CurrencyConverter.getCurrencyFromCountry(CurrencyConverter.countryCode);
+  let currency = CurrencyConverter.getCurrency();
 
-  // Ensure currency is supported by Shopify
   if (window.Shopify?.shop?.enabled_currencies) {
     const supportedCurrencies = window.Shopify.shop.enabled_currencies.map(
       (c) => c.iso_code
@@ -134,16 +131,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Update prices initially
   CurrencyConverter.updatePrices(currency);
 
-  // Watch for variant changes or dynamic updates
   const observer = new MutationObserver(() => {
     CurrencyConverter.updatePrices(currency);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
-  // Listen for Shopify currency selector changes
   document.addEventListener("currency:change", (event) => {
     currency = event.detail.currency || currency;
     CurrencyConverter.updatePrices(currency);
